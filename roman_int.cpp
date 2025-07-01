@@ -1,29 +1,6 @@
 #include "std_lib_facilities.h"
 #include "roman_int.h"
 
-// What we really need to do its process each char individually from the end.
-// Processing a char then, becomes seeing if more input exists. 
-// if so, keep going
-
-// Another idea is to utilize the module operator to determine values of an int.
-
-//https://www.cuemath.com/numbers/roman-numerals-1-to-1000/ // has the rules
-
-// Remember V, L, and D cannot be repeated, they appear only once.
-
-string reverse_string(string s)
-{	
-	// Reverses a string. 
-	string new_str;
-
-	for (int i = s.size() - 1; i >= 0; --i)
-	{
-		new_str += to_string(s[i]); 
-	}
-
-	return new_str; 
-}
-
 int return_offset(const int numb)
 {	
 	// This unique function determines precisely how we should offset the given integer index for the process int program below. 
@@ -230,28 +207,6 @@ int roman_to_int(const string s)
 	return total;  
 }
 
-Roman_int process_char(const char c)
-{	
-	// Process a character into a roman numeral (roman_int). 
-	// 
-	// If valid, return a roman_int that represents this individual char.
-	const int invalid = -1; 
-	int val = 5; // just a placeholder for now. 
-	//int val = validate_char(c); need to update this function for the function call.
-
-	if (val == invalid)
-	{
-		error("Invalid reading");
-	}
-	else
-	{
-		Roman_int r;
-		r.value = val; 
-		r.numerals = c; 
-		return r; 
-	}
-}
-
 int validate_char(const char c, vector<char> repeats, vector<int>& flags)
 {	
 	for (int i = 0; i < repeats.size(); ++i)
@@ -317,20 +272,19 @@ Roman_int sub_roman(Roman_int& left, Roman_int& right)
 
 Roman_int get_roman()
 {
-	// Converts a given roman numeral to valid integer.
-	// -1 denotes invalid string.
+	// Retrieve a set of characters from CIN
+	// Process into a Roman_int
 	
 	char c; 
 	int total = 0;
 	int count = 1; // Counts repeating elements
-	int buffer = 9999; // start at 9999, no numeral can be bigger than this.
-	char last_element = 'z';
-	const vector<char> repeats = { 'V', 'L', 'D' };
-	vector<int> flags = { 1, 1, 1 };
+	int buffer = 9999; // start at 9999, no numeral can be bigger than this. // A buffer to store previous relevant numerical values. 
+	char last_element = 'z'; // Last char before current just read in. 
+	vector<int> flags = { 1, 1, 1 }; // TO track special characters which only occur once (see repeats vector)
 
-	Roman_int r; 
+	Roman_int r; // The struct we intend to return. 
 
-	int last_val = 99999; /// error check, see evil case MCMC 
+	int last_val = 99999; // This value needs to be stored in the case of a subtraction. 
 
 	while (true)
 	{
@@ -338,14 +292,16 @@ Roman_int get_roman()
 
 		if (c == '=')
 		{	
+			// End of input
 			cout << "STOP.\n"; 
 			break; 
 		}
 
-		// Obtain the value. 
+		// Obtain the value and process into a valid integer 
+		// Or -1 if invalid. 
 		int value = validate_char(c, repeats, flags);
 
-		// First check for repeat elements and reset accordingly. 
+		// Now, check for repeating elements and reset count accordingly. 
 		if (c == last_element)
 		{
 			++count;
@@ -356,44 +312,38 @@ Roman_int get_roman()
 			count = 1;
 		}
 
+		// After these updates check if loop is still valid. 
 		if (value == -1 || count > 3)
 		{
 			// invalid
 			error("Invalid input."); 
 		}
+		// If it is perform arithmetic checks as follows
 		else if (value > buffer)
-		{
-			last_val = buffer; //DEBUG
-			// subract and update total using method
-			// update buffer
-			//cout << "Subtracting\n";
+		{	
+			// Store the last value
+			last_val = buffer; 
+			// Perform the subtraction and update result
 			int result = (value - buffer);
-			//cout << "Result = value - buffer";
-			//cout << result << " = " << value << " - " << buffer << "\n";
+			// Update the total accordingly, while aligning the buffer.
 			total -= buffer; // remove the last buffer value; 
-			total += result; // replace it with the result. 
-			total = sub_check(total, buffer, result);
-			buffer = result;
-			//buffer = value; // Changing this, the buffer should hold the result now, not the value. 
-			last_element = c; // DEBUG LINE
-
-			r.numerals.push_back(c); 
-			//r.value = total; 
+			total += result; // replace it with the result of the subtraction. (Because we intend to subtract what would have been added (buffers last value))
+			total = sub_check(total, buffer, result); // A very important error check. 
+			buffer = result; // Update the buffer with validated result. 
+			last_element = c; // Update last element
+			r.numerals.push_back(c); // Update the numeral string. 
 		}
 		else if (value <= buffer && value < last_val) // apply the rule of subtractive decent [LV RV NEW] then NEW < LV 
 		{
-			//cout << "The value " << value << " is less than last val " << last_val << "\n";
-			// add to total.
-			// update buffer. 
-			total += value;
-			buffer = value;
-			last_element = c;
-
-			r.numerals.push_back(c);
-			//r.value = total;
+			// Most cases we add and it is simpler.
+			total += value; // We update the total.
+			buffer = value; // Update buffer
+			last_element = c; // Update the previous char. 
+			r.numerals.push_back(c); // Update numeral string. 
 		}
 		else
-		{
+		{	
+			// Fall through case, highly unlikely or impossible this would occur, but a nice safety net. 
 			error("Invalid input.");
 		}
 	} // end while
@@ -401,25 +351,25 @@ Roman_int get_roman()
 	// Final check.
 	if (total == -1)
 	{	
+		// We can still see the numeral, but it confirms this numeral is invalid. 
 		r.numerals += "(INVALID)";
 	}
+	// Update the total integer value of the numeral string.
+	// Return the entire struct. 
 	r.value = total; 
 	return r; 
 }
 
 ostream& operator<<(ostream& ost, Roman_int& r)
 {
-	// Temporary for now. 
-	return ost; 
+	return ost << r.numerals; 
 }
 
-/*
-Not sure what Bjarne meant by an input operator for roman_int?
-The real question is how the compiler is supposed to recognize an input of char over an int.
+//Not sure what Bjarne meant by an input operator for roman_int?
+///The real question is how the compiler is supposed to recognize an input of char over an int.
 
-istream& operator>>(istream& ist, roman_int& r)
-{
-	// Input a roman_int
+//istream& operator>>(istream& ist, roman_int& r)
+//{
+	//return get_roman(); 
 
-}
-*/
+//}
