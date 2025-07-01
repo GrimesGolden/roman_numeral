@@ -23,6 +23,9 @@
 // Notes: https://www.timeanddate.com/calendar/how-do-roman-numerals-work.html
 
 
+// As it stands is only valid for 0-4000. 
+
+
 void input_test()
 {	
 	while (true)
@@ -75,29 +78,16 @@ int main()
 	"XD",
 	"LC",
 	"XXL",
-	"MCMC" // bastard case 
+	"MCMC",// bastard case 
+	"VV",
+	"VVVVV",
+	"XVXVX",
+	"XXXDXXX"
 		};
 
-		//cout << "The bastard case MCMC: " << roman_to_int("MCMC");
+		Roman_int r = get_roman();
 
-		
-		vector<string> numerals; 
-
-		for (string s : evil_cases)
-		{
-			cout << " Converting " << s << " result is: " << roman_to_int(s) << "\n";
-		}
-
-		for (int i = 1000; i <= 3000; ++i)
-		{
-			numerals.push_back(int_to_roman(i));
-		}
-
-		for (int i = 0; i <= numerals.size(); ++i)
-		{
-			cout << "Number " << i+1 << " = " << numerals[i] << " converted to an integer is " << roman_to_int(numerals[i]) << "\n";
-		}
-		
+		cout << "The numeral is " << r.numerals << " the value is " << r.value; 
 	
 
 	}

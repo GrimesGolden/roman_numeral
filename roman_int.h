@@ -3,7 +3,6 @@
 
 const vector<char> char_tbl{ 'I', 'V', 'X', 'L', 'C', 'D', 'M'};
 const vector<int> int_tbl{ 1, 5, 10, 50, 100, 500, 1000};
-const char stop = '='; 
 
 struct Roman_int
 {

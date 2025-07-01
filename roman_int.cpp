@@ -316,65 +316,94 @@ Roman_int sub_roman(Roman_int& left, Roman_int& right)
 }
 
 Roman_int get_roman()
-{	
+{
+	// Converts a given roman numeral to valid integer.
+	// -1 denotes invalid string.
+	
 	char c; 
-	char next_c; 
-	const int invalid = -1; 
+	int total = 0;
+	int count = 1; // Counts repeating elements
+	int buffer = 9999; // start at 9999, no numeral can be bigger than this.
+	char last_element = 'z';
+	const vector<char> repeats = { 'V', 'L', 'D' };
+	vector<int> flags = { 1, 1, 1 };
+
 	Roman_int r; 
 
+	int last_val = 99999; /// error check, see evil case MCMC 
+
 	while (true)
-	{	
-		// Read in a value. 
+	{
 		cin >> c; 
 
-		cout << "Read in value " << c << "\n";
-
-		if (c == stop)
-		{
-			cout << "Stop detected, break"; 
-			cin.putback(c);
+		if (c == '=')
+		{	
+			cout << "STOP.\n"; 
 			break; 
 		}
 
-		r = process_char(c);
+		// Obtain the value. 
+		int value = validate_char(c, repeats, flags);
 
-		cin >> next_c; 
-		cout << "Read in next value " << next_c << "\n";
-
-		if (next_c == stop)
+		// First check for repeat elements and reset accordingly. 
+		if (c == last_element)
 		{
-			cout << "Break detected due to next_c\n";
-			cin.putback(next_c);
-			break; 
+			++count;
+		}
+		else if (c != last_element)
+		{
+			// reset count; 
+			count = 1;
 		}
 
-		cin.putback(next_c);
-		cout << "Put back " << next_c << "\n"; 
+		if (value == -1 || count > 3)
+		{
+			// invalid
+			error("Invalid input."); 
+		}
+		else if (value > buffer)
+		{
+			last_val = buffer; //DEBUG
+			// subract and update total using method
+			// update buffer
+			//cout << "Subtracting\n";
+			int result = (value - buffer);
+			//cout << "Result = value - buffer";
+			//cout << result << " = " << value << " - " << buffer << "\n";
+			total -= buffer; // remove the last buffer value; 
+			total += result; // replace it with the result. 
+			total = sub_check(total, buffer, result);
+			buffer = result;
+			//buffer = value; // Changing this, the buffer should hold the result now, not the value. 
+			last_element = c; // DEBUG LINE
 
-		Roman_int next = get_roman(); 
+			r.numerals.push_back(c); 
+			//r.value = total; 
+		}
+		else if (value <= buffer && value < last_val) // apply the rule of subtractive decent [LV RV NEW] then NEW < LV 
+		{
+			//cout << "The value " << value << " is less than last val " << last_val << "\n";
+			// add to total.
+			// update buffer. 
+			total += value;
+			buffer = value;
+			last_element = c;
 
-		if ((next.value - r.value) <= 1)
-		{
-			// add.
-			r = add_roman(r, next);
+			r.numerals.push_back(c);
+			//r.value = total;
 		}
-		else if ((next.value - r.value) > 2)
+		else
 		{
-			// subt 
-			// This is your problem, your subtraction rules are wrong.
-			// If you had subtraction rules correct then IIV wouldnt work
-			// because this is 4-1, an invalid sub. 
-			// I quote "You can subtract ? from ? (5) and ? (10) but never from ? (100)" 
-			// "To write 99, you have to subtract 10 from 100 (??) and add the subtraction of 1 from 10 (?)" 
-			r = sub_roman(r, next);
+			error("Invalid input.");
 		}
-		else if ((next.value - r.value) == 2)
-		{
-			error("Invalid numeral.");
-		}
-		// END END END
+	} // end while
+
+	// Final check.
+	if (total == -1)
+	{	
+		r.numerals += "(INVALID)";
 	}
-	// Outside of while
+	r.value = total; 
 	return r; 
 }
 
