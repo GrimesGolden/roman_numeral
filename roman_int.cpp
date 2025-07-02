@@ -3,20 +3,22 @@
 
 int return_offset(const int numb)
 {	
-	// This unique function determines precisely how we should offset the given integer index for the process int program below. 
+	// This unique function determines how we should offset the given integer index for the process int function below. 
 	// Returns the correct offset to determine subtractive value check. 
 	
+	// This is working on an iterative index (numb)
 	if (numb == 0)
 	{
 		return 0;
 	}
 	else if (numb % 2 == 0)
 	{
-		// even
+		// If even drop down the table by 2.
 		return int_tbl[numb-2];
 	}
 	else if (numb % 2 != 0)
 	{
+		// If odd drop by 1
 		return int_tbl[numb-1]; 
 	}
 }
@@ -24,14 +26,16 @@ int return_offset(const int numb)
 string process_int(int numb)
 {	
 	// Processes an integer into a correct numeral string
+	// Intended to work on the least expendable form of an integer, that is 1,10s,100s etc. 
 	string numeral = "";
 	string buffer = "";
 
 	while (numb != 0)
 	{	
+		// Iterate through the available roman numeral values. 
 		for (int i = int_tbl.size() - 1; i >= 0; --i)
 		{	 
-			// Check for match. 
+			// Check for match. // This is an important piece of math for the entire program to function effectively. Critical line. 
 			if (int_tbl[i] <= numb || int_tbl[i] - return_offset(i) == numb)
 			{	
 				// If match update the number
@@ -54,7 +58,6 @@ string process_int(int numb)
 			}
 		}
 	}
-
 	return (numeral + buffer); 
 }
 
@@ -90,7 +93,6 @@ string int_to_roman(int numb)
 	{
 		if (n > 0)
 		{	
-			//cout << "processing " << n << " \n";
 			string s = process_int(n);
 			numerals += s; 
 		}
@@ -118,8 +120,9 @@ int sub_check(int total, int lv, int result)
 		}
 	}
 
-	// The tobin method of error checking
-	// TOTAL mod [10*left_val] = subtraction result
+	// A unique method of error checking.
+	// CURRENT TOTAL mod [10*left_val] = subtraction result
+	// If the result matches this formula its valid, else its not a valid subtraction. 
 	int calculation = total % (offset * lv);
 
 	// If the calculation is valid return. 
@@ -144,8 +147,7 @@ int roman_to_int(const string s)
 	char last_element = 'z';
 	const vector<char> repeats = { 'V', 'L', 'D' }; 
 	vector<int> flags = { 1, 1, 1 }; 
-
-	int last_val = 99999; /// error check, see evil case MCMC 
+	int last_val = 99999; // Store last value in case of subtraction. 
 
 	if (s.empty())
 	{	
@@ -176,25 +178,18 @@ int roman_to_int(const string s)
 		}
 		else if (value > buffer)
 		{	
-			last_val = buffer; //DEBUG
+			last_val = buffer; 
 			// subract and update total using method
 			// update buffer
-			//cout << "Subtracting\n";
 			int result = (value - buffer);
-			//cout << "Result = value - buffer";
-			//cout << result << " = " << value << " - " << buffer << "\n";
 			total -= buffer; // remove the last buffer value; 
 			total += result; // replace it with the result. 
 			total = sub_check(total, buffer, result); 
 			buffer = result; 
-			//buffer = value; // Changing this, the buffer should hold the result now, not the value. 
-			last_element = c; // DEBUG LINE
+			last_element = c; 
 		}
 		else if (value <= buffer && value < last_val) // apply the rule of subtractive decent [LV RV NEW] then NEW < LV 
 		{	
-			//cout << "The value " << value << " is less than last val " << last_val << "\n";
-			// add to total.
-			// update buffer. 
 			total += value; 
 			buffer = value; 
 			last_element = c; 
@@ -209,6 +204,7 @@ int roman_to_int(const string s)
 
 int validate_char(const char c, vector<char> repeats, vector<int>& flags)
 {	
+	// Check a given character for repeats, such as IIII. 
 	for (int i = 0; i < repeats.size(); ++i)
 	{
 		if (c == repeats[i])
@@ -226,6 +222,7 @@ int validate_char(const char c, vector<char> repeats, vector<int>& flags)
 		}
 	}
 
+	// COnvert using table. 
 	for (int i = 0; i < char_tbl.size(); ++i)
 	{
 		if (c == char_tbl[i])
@@ -235,39 +232,6 @@ int validate_char(const char c, vector<char> repeats, vector<int>& flags)
 	}
 	// -1 denotes an invalid char.
 	return -1;
-}
-
-Roman_int add_roman(Roman_int& left, Roman_int& right)
-{	
-	// The standard method for combining roman numerals. 
-	Roman_int new_r; 
-
-	int new_val = left.value + right.value; 
-
-	string new_numerals = left.numerals + right.numerals; 
-
-	new_r.value = new_val;
-	new_r.numerals = new_numerals; 
-
-	return new_r; 
-
-}
-
-Roman_int sub_roman(Roman_int& left, Roman_int& right)
-{
-	// The standard method for combining roman numerals. 
-	Roman_int new_r;
-
-	// In this case we need to subtract, for example with "IV = 4". 
-	int new_val = right.value - left.value;
-
-	string new_numerals = left.numerals + right.numerals;
-
-	new_r.value = new_val;
-	new_r.numerals = new_numerals;
-
-	return new_r;
-
 }
 
 Roman_int get_roman()
@@ -360,10 +324,238 @@ Roman_int get_roman()
 	return r; 
 }
 
+bool is_digit(char c)
+{
+	// Library version wasnt working for some reason. 
+	switch (c) {
+	case '0':
+		return true; 
+		break;
+	case '1':
+		return true;
+		break;
+	case '2':
+		return true;
+		break;
+	case '3':
+		return true;
+		break;
+	case '4':
+		return true;
+		break;
+	case '5':
+		return true;
+		break;
+	case '6':
+		return true;
+		break;
+	case '7':
+		return true;
+		break;
+	case '8':
+		return true;
+		break;
+	case '9':
+		return true;
+		break; 
+	default:
+		return false; 
+		break;
+	}
+}
+
+bool is_roman(char c)
+{
+	for (char numeral : char_tbl)
+	{
+		if (c == numeral)
+		{
+			return true;
+		}
+	}
+	return false; 
+}
+
+void romanize(string& fname, string& ofname)
+{
+	ifstream ist{ fname };
+	ofstream ost{ ofname };
+
+	if (!ist || !ost)
+	{
+		error("Could not open file.\n");
+	}
+
+	string value = "";
+	bool last = false; 
+	for (char c; ist.get(c);)
+	{
+		if (is_digit(c))
+		{	
+			//cout << "This is a digit! " << c << "\n";
+			value += c; 
+			last = true; 
+		}
+		else if (last)
+		{
+			int numb = stoi(value);
+	
+			if (numb > 0 && numb <= 4000)
+			{
+				string numerals = int_to_roman(numb);
+				ost << numerals << " ";
+			}
+			else
+			{
+				ost << value;
+			}
+
+			value = "";
+			last = false;
+		}
+		else
+		{
+			ost << c;
+		}
+	}
+
+	cout << "Success...exiting\n";
+}
+
+void deromanize(string& fname, string& ofname)
+{
+	ifstream ist{ fname };
+	ofstream ost{ ofname };
+
+	if (!ist || !ost)
+	{
+		error("Could not open file.\n");
+	}
+
+	string value = "";
+	bool last = false;
+
+	for (char c; ist.get(c);)
+	{
+		if (is_roman(c))
+		{
+			//cout << "This is a digit! " << c << "\n";
+			value += c;
+			last = true;
+		}
+		else if (last)
+		{
+			int numb = roman_to_int(value);
+
+			if (numb == -1)
+			{	
+				// If invalid just print it back and carry on. 
+				ost << value;
+			}
+			else
+			{
+				ost << numb;
+			}
+
+			ost << c; 
+			value = "";
+			last = false;
+		}
+		else
+		{
+			ost << c;
+		}
+	}
+
+	cout << "Success...exiting\n";
+}
+
+
+
 ostream& operator<<(ostream& ost, Roman_int& r)
 {
 	return ost << r.numerals; 
 }
+
+Roman_int operator+(Roman_int& l, Roman_int& r)
+{
+	int left = l.value;
+	int right = r.value;
+
+	int v = left + right;
+
+	string n = int_to_roman(v);
+
+	Roman_int result;
+	result .value = v;
+	result.numerals = n;
+
+	return result; 
+}
+
+Roman_int operator-(Roman_int& l, Roman_int& r)
+{
+	int left = l.value;
+	int right = r.value;
+
+	int v = left - right;
+
+	string n = int_to_roman(v);
+
+	Roman_int result;
+	result.value = v;
+	result.numerals = n;
+
+	return result;
+}
+
+Roman_int operator/(Roman_int& l, Roman_int& r)
+{
+	int left = l.value;
+	int right = r.value;
+
+	if (right == 0)
+	{
+		error("Divide by zero.");
+	}
+
+	int v = left/right;
+
+	string n = int_to_roman(v);
+
+	Roman_int result;
+	result.value = v;
+	result.numerals = n;
+
+	return result;
+}
+
+void operator--(Roman_int& l)
+{
+	int left = l.value;
+	int v = left - 1;
+	string n = int_to_roman(v);
+	Roman_int result;
+	result.value = v;
+	result.numerals = n;
+
+	l = result;
+}
+
+void operator++(Roman_int& l)
+// Unary
+{	
+	int left = l.value;
+	int v = left + 1;
+	string n = int_to_roman(v);
+	Roman_int result;
+	result.value = v;
+	result.numerals = n;
+
+	l = result; 
+}
+
+
 
 //Not sure what Bjarne meant by an input operator for roman_int?
 ///The real question is how the compiler is supposed to recognize an input of char over an int.

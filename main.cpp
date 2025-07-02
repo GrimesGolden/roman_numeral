@@ -41,14 +41,29 @@ int main()
 	"XVXVX",
 	"XXXDXXX"
 		};
-
-	Roman_int r = get_roman(); // A roman int. 
-
+	
+		/*
+		* Roman_int r = get_roman(); // A roman int. 
+	Roman_int l = get_roman();
 
 	cout << " Roman " << r << " equals " << r.as_int() << "\n";
-	// Exactly as bjarne asked. 
-	
+	cout << " Roman " << l << " equals " << l.as_int() << "\n";
 
+	Roman_int a = r/l;
+	cout << " Roman " << a << " equals " << a.as_int() << "\n";
+	++a;
+	cout << " Roman " << a << " equals " << a.as_int() << "\n";
+	--a;
+	cout << " Roman " << a << " equals " << a.as_int() << "\n";
+		*/
+	// Exactly as bjarne asked. 
+
+		string name = "input.txt";
+		string oname = "output.txt";
+		string rname = "reversed.txt";
+		string test = "test.txt";
+
+		deromanize(test, oname);
 	}
 	catch (const std::exception& e)
 	{

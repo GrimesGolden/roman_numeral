@@ -18,14 +18,22 @@ struct Roman_int
 };
 
 
+
+bool is_digit(char c);
+void romanize(string& fname, string& ofname);
+void deromanize(string& fname, string& ofname);
 int sub_check(int total, int lv, int result);
 string int_to_roman(int numb);
 int roman_to_int(const string s);
 string process_int(int numb);
 int return_offset(const int numb);
 int validate_char(const char c, vector<char> repeats, vector<int>& flags);
-Roman_int add_roman(Roman_int& left, Roman_int& right);
-Roman_int sub_roman(Roman_int& left, Roman_int& right);
 Roman_int get_roman();
+// Operator overloads, including calculator capability (exercise 7 chapter 10).  
 ostream& operator<<(ostream& ost, Roman_int& r); 
+void operator++(Roman_int& l);
+void operator--(Roman_int& l);
+Roman_int operator-(Roman_int& l, Roman_int& r);
+Roman_int operator+(Roman_int& l, Roman_int& r);
+Roman_int operator/(Roman_int& l, Roman_int& r);
 //istream& operator>>(istream& ist, roman_int& r); 
